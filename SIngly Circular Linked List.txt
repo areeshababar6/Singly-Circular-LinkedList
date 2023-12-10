@@ -1,0 +1,286 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+
+
+class SNode
+{
+private:
+	int data;
+	SNode* link;
+public:
+	SNode();
+	SNode(int);
+
+	void setData(int);
+	void setLink(SNode*);
+
+	int getData();
+	SNode* getLink();
+};
+SNode::SNode()
+{
+	data = 0;
+	link = NULL;
+}
+SNode::SNode(int d)
+{
+	data = d;
+	link = NULL;
+}
+void SNode::setData(int d)
+{
+	data = d;
+}
+void SNode::setLink(SNode* l)
+{
+	link = l;
+}
+int SNode::getData()
+{
+	return data;
+}
+SNode* SNode::getLink()
+{
+	return link;
+}
+
+//-----------------------------------------------------
+
+class SCList
+{
+private:
+	SNode* last;
+	int rRevPrint(SNode* temp);
+	SNode* rRevList(SNode* temp);
+
+public:
+	SCList();
+	SCList(SNode*);
+
+	void insert(SNode*, SNode*);
+	void Delete(SNode*);
+	void print();
+	void insertBetween(SNode*, SNode*, SNode*);
+
+	void RevPrint();
+	void ReversePrint();
+
+	void ReverseList();
+	void RevList();
+};
+SCList::SCList()
+{
+	last = 0;
+}
+SCList::SCList(SNode* l)
+{
+	last = l;
+}
+void SCList::insert(SNode* pB, SNode* pN)
+{
+	if (!last && !pB)
+	{
+		last = pN;
+		last->setLink(last);
+	}
+	else if (last && pB == last)
+	{
+		pN->setLink(pB->getLink());
+		pB->setLink(pN);
+		last = pN;
+	}
+	else if (last && pB != last)
+	{
+		pN->setLink(pB->getLink());
+		pB->setLink(pN);
+	}
+
+}
+//---------------------
+void SCList::Delete(SNode* pDelete)
+{
+	SNode* temp;
+	temp = last->getLink();
+
+	while (pDelete != temp->getLink())
+	{
+		temp = temp->getLink();
+	}
+
+	temp->setLink(pDelete->getLink());
+	if (pDelete == last)
+		last = temp;
+
+	delete pDelete;
+}
+//--------------------------
+void SCList::print()
+{
+	cout << " Printing list..." << endl;
+	int i = 1;
+	SNode* temp;
+	temp = last->getLink();
+
+	SNode* first;
+	first = temp;
+
+	cout << " Value at node " << i << ": " << temp->getData() << endl;
+	temp = temp->getLink();
+	i++;
+	while (temp != first)
+	{
+		cout << " Value at node " << i << ": " << temp->getData() << endl;
+		temp = temp->getLink();
+		i++;
+	}
+}
+//-----------------------
+void SCList::insertBetween(SNode* pB, SNode* pA, SNode* pN)
+{
+	if (!last && !pB && !pA)
+	{
+		last = pN;
+		last->setLink(last);
+	}
+	else if (last && pA && last == pB)
+	{
+		pN->setLink(pB->getLink());
+		pB->setLink(pN);
+		last = pN;
+	}
+	else  if (last && pB && pA)
+	{
+		pN->setLink(pA);
+		pB->setLink(pN);
+	}
+}
+//---------------
+void SCList::RevPrint()
+{
+	int s;
+	cout << " " << last->getData() << " -> ";
+	s = rRevPrint(last->getLink());
+	cout << s << endl;
+}
+int SCList::rRevPrint(SNode* temp)
+{
+	if (temp->getLink() == last)
+		return temp->getData();
+
+	int s = rRevPrint(temp->getLink());
+	cout << s << " -> ";
+
+	return temp->getData();
+}
+//----------------
+
+void SCList::ReversePrint()
+{
+	stack<int> s;
+	SNode* temp = last->getLink();
+
+	do{
+		s.push(temp->getData());
+		temp = temp->getLink();
+	} while (temp != last->getLink());
+
+	
+	while (!s.empty()) // (s.size())
+	{
+		cout << " " << s.top();
+		if (s.size() != 1)
+			cout << " ->";
+		s.pop();
+	}
+	cout << "\n";
+}
+//----------------
+void SCList::RevList()
+{
+	SNode* Bef, * Aft, * cur;
+	Bef = last;
+	Aft = NULL;
+	cur = last->getLink();
+
+	last = last->getLink();
+
+	while (Aft != last)
+	{
+		Aft = cur->getLink();
+		cur->setLink(Bef);
+		Bef = cur;
+		cur = Aft;
+	}
+}
+//---------------
+void SCList::ReverseList()
+{
+	SNode* s;
+	s = rRevList(last->getLink());
+	s->setLink(last);
+	last = s;
+}
+SNode* SCList::rRevList(SNode* temp)
+{
+	if (temp == last)
+		return temp;
+
+	SNode* s;
+	s = rRevList(temp->getLink());
+
+	s->setLink(temp);
+	return temp;
+}
+//-----------------
+
+int main()
+{
+	SNode* a, * b, * c, * d, * e;
+
+	a = new SNode(1);
+	b = new SNode(2);
+	c = new SNode(3);
+	d = new SNode(4);
+	e = new SNode(5);
+
+	SCList* list;
+	list = new SCList();
+
+	list->insert(0, a);
+	list->insert(a, b);
+	list->insert(b, c);
+	list->insert(a, d);
+	list->insert(b, e);
+
+	list->print();
+
+	list->Delete(c);
+	cout << "\n After delete function is called..." << endl;
+	list->print();
+
+	SNode* f, * g;
+	f = new SNode(6);
+	g = new SNode(7);
+
+	list->insertBetween(a, d, f);
+	list->insertBetween(e, a, g);
+
+	cout << "\n After insertBetween function is called..." << endl;
+	list->print();
+
+	cout << "\n Printing reverse list (recursively)" << endl;
+	list->RevPrint();
+	cout << "\n Printing reverse list (iteratively)" << endl;
+	list->ReversePrint();
+
+	cout << "\n Reversing list (iteratively)" << endl;
+	list->ReverseList();
+	list->print();
+	cout << "\n Reversing list (recursively)" << endl;
+	list->RevList();
+	list->print();
+
+	system("pause");
+	return 0;
+}
